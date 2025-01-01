@@ -1,6 +1,65 @@
 import subprocess
 import matplotlib.pyplot as plt
 import re
+import torch
+import pandas as pd
+
+def dict_to_excel(dictionary):
+   key_length=len(list(dictionary.items())[0][0])
+   new_dict={}
+   for i in range(key_length):
+       new_dict[i]=[]
+   new_dict[key_length]=[]
+   for key,values in dictionary.items():
+       for i in range(key_length):
+           new_dict[i].append(key[i])
+       new_dict[key_length].append(values)
+
+   pd.DataFrame(new_dict).to_excel(r"C:\Users\USER\Desktop\WebAgent\Agent\transition_function.xlsx",index=False)
+
+   
+def excel_to_dict():
+   df=pd.read_excel(r"C:\Users\USER\Desktop\WebAgent\Agent\transition_function.xlsx")
+   df=df.replace({float('nan'):None})
+   key_length=len(df.columns)-1
+   new_dictionary={}
+   for _,row in df.iterrows():
+    row_tuple=()
+    for i in range(key_length):
+      row_tuple=row_tuple+(row[i],)
+    #new_dictionary[row_tuple]=re.findall("'([^']*)'", row[key_length])
+    new_dictionary[row_tuple]=eval(row[key_length])
+   return new_dictionary
+   
+def are_images_same(matrix1, matrix2):
+  """
+  Checks if two matrices are equal using GPU acceleration with PyTorch.
+
+  Args:
+    matrix1: The first matrix as a numpy array.
+    matrix2: The second matrix as a numpy array.
+
+  Returns:
+    True if the matrices are equal, False otherwise.
+  """
+  matrix1=torch.Tensor(matrix1)
+  matrix2=torch.Tensor(matrix2)
+  # Move tensors to GPU if available
+  if torch.cuda.is_available():
+    device = torch.device("cuda")
+    matrix1 = matrix1.to(device)
+    matrix2 = matrix2.to(device)
+  else:
+    device = torch.device("cpu")
+
+  # Check for element-wise equality
+  result = torch.all(torch.eq(matrix1, matrix2))
+
+  # Return the result
+  return result.item() 
+
+def bbox_coods_to_HTML_coods(bbox_coods):
+   return (bbox_coods[0]*(781/976),bbox_coods[1]*(30/38))
 
 def extract_bbox_coods(bbox_string):
     return [(int(bbox_string.split()[1]),int(bbox_string.split()[2])),(int(bbox_string.split()[3]),int(bbox_string.split()[4]))]
