@@ -4,7 +4,7 @@ The goal of the project is to develop an agent that:
 3. Have conversations in natural language. 
 
 Perception:
-Optical Character Recognition, Object Detection and HTML parsing are used to perceive the environment.
+Optical Character Recognition, Object Detection and HTML parsing.
 
 Fundamental Actions: click, scroll, move mouse, screenshot, obtain iteractables from HTML
 
